@@ -545,6 +545,7 @@ tbody tr{animation:fadeIn .2s ease both;}
 <nav class="tabs-nav">
   <button class="tab-btn active" onclick="switchTab('prod',this)">📦 Produtividade</button>
   <button class="tab-btn" onclick="switchTab('meal',this)">🍱 Meal Accuracy</button>
+  <button class="tab-btn" onclick="switchTab('ocio',this)">😴 Ociosidade</button>
   <button class="tab-btn" onclick="switchTab('dicas',this)">💡 Dicas</button>
   <button class="tab-btn" onclick="switchTab('escala',this)">📅 Escala</button>
   <button class="tab-btn" onclick="switchTab('info',this)">ℹ️ Informações</button>
@@ -578,7 +579,7 @@ tbody tr{animation:fadeIn .2s ease both;}
     <div class="sum-card c-red"><div class="sum-label">Abaixo</div><div class="sum-val v-red" id="s-abaixo">—</div><div class="sum-sub" id="s-abaixo-sub">prod &lt; 85</div></div>
     <div class="sum-card c-gray"><div class="sum-label">Sem Produção</div><div class="sum-val v-gray" id="s-sem">—</div><div class="sum-sub">não registrado</div></div>
     <div class="sum-card c-purple"><div class="sum-label">Total Unidades</div><div class="sum-val v-purple" id="s-units">—</div><div class="sum-sub">no turno</div></div>
-    <div class="sum-card" style="border-bottom:3px solid #f59e0b;"><div class="sum-label" style="color:#b45309;">⚠️ Util. &lt; 85%</div><div class="sum-val" id="s-util-baixo" style="color:#b45309;">—</div><div class="sum-sub" id="s-util-pct">de <span id="s-util-total">—</span> ativos</div></div>
+    <div class="sum-card" style="border-bottom:3px solid #f59e0b;"><div class="sum-label" style="color:#b45309;">⚠️ Util. &lt; 85%</div><div class="sum-val" id="s-util-baixo" style="color:#b45309;">—</div><div class="sum-sub">média geral: <strong id="s-util-media" style="color:#b45309;">—</strong></div></div>
   </div>
 
   <div class="filter-bar">
@@ -704,6 +705,64 @@ tbody tr{animation:fadeIn .2s ease both;}
   </div>
 
   <div class="footer">BRRJ02 | Outbound Picking T1 · Meal Accuracy KPI</div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB — OCIOSIDADE
+════════════════════════════════════════════ -->
+<div id="tab-ocio" class="tab-panel">
+  <div class="page-header">
+    <div class="page-header-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7)">😴</div>
+    <div class="page-header-text">
+      <div class="page-header-label">Ranking de Ociosidade</div>
+      <div class="page-header-title">Tempo Ocioso</div>
+      <div class="page-header-sub">Ref: <strong id="ocio-date">—</strong> · T1 — Outbound Picking</div>
+    </div>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="summary-grid" id="ocio-summary-grid">
+    <div class="sum-card c-total"><div class="sum-label">Total Reps</div><div class="sum-val v-navy" id="oc-total">—</div><div class="sum-sub">na base</div></div>
+    <div class="sum-card c-red"><div class="sum-label">Ocio. ≥ 30%</div><div class="sum-val v-red" id="oc-alto">—</div><div class="sum-sub">crítico</div></div>
+    <div class="sum-card c-orange"><div class="sum-label">Ocio. 15–29%</div><div class="sum-val v-orange" id="oc-med">—</div><div class="sum-sub">atenção</div></div>
+    <div class="sum-card c-green"><div class="sum-label">Ocio. &lt; 15%</div><div class="sum-val v-green" id="oc-ok">—</div><div class="sum-sub">dentro do esperado</div></div>
+    <div class="sum-card c-purple"><div class="sum-label">Total Unidades</div><div class="sum-val v-purple" id="oc-units">—</div><div class="sum-sub">no turno</div></div>
+  </div>
+
+  <!-- Filter -->
+  <div class="filter-bar">
+    <button class="filter-tab active" onclick="setOcioFilter('all',this)">Todos <span class="f-badge fb-all" id="of-all">—</span></button>
+    <button class="filter-tab" onclick="setOcioFilter('alto',this)" style="color:#dc2626">🔴 Crítico ≥30% <span class="f-badge" id="of-alto" style="background:#fee2e2;color:#dc2626">—</span></button>
+    <button class="filter-tab" onclick="setOcioFilter('med',this)" style="color:#ea580c">🟠 Atenção 15–29% <span class="f-badge" id="of-med" style="background:#ffedd5;color:#ea580c">—</span></button>
+    <button class="filter-tab" onclick="setOcioFilter('ok',this)" style="color:#16a34a">🟢 Ok &lt;15% <span class="f-badge" id="of-ok" style="background:#dcfce7;color:#16a34a">—</span></button>
+  </div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="ocio-search" placeholder="Buscar por ID..." oninput="renderOcio()"/>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>ID</th>
+          <th>% Ocioso</th>
+          <th>Tempo Ocioso</th>
+          <th>Utilização</th>
+          <th>Unid.</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-ocio"></tbody>
+    </table>
+    <div class="no-rows" id="no-rows-ocio" style="display:none">Nenhum colaborador encontrado.</div>
+  </div>
+  <div class="footer">BRRJ02 | Outbound Picking T1 · Ranking de Ociosidade</div>
 </div>
 
 <!-- ════════════════════════════════════════════
@@ -942,64 +1001,56 @@ tbody tr{animation:fadeIn .2s ease both;}
 const repsRS = [
   {id:2217898,prod:208.0,util:88.26,units:157},
   {id:2391514,prod:186.0,util:77.16,units:135},
-  {id:2390664,prod:181.0,util:86.78,units:585},
-  {id:2109430,prod:177.0,util:90.06,units:570},
-  {id:2427052,prod:177.0,util:95.86,units:572},
-  {id:2391616,prod:176.0,util:96.19,units:567},
   {id:2391407,prod:175.0,util:84.2,units:130},
   {id:2461288,prod:174.0,util:89.66,units:134},
   {id:2391079,prod:169.0,util:91.19,units:183},
   {id:2428349,prod:169.0,util:91.89,units:169},
+  {id:2427052,prod:167.0,util:94.95,units:1172},
   {id:2391025,prod:164.0,util:76.28,units:131},
   {id:1762361,prod:158.0,util:77.43,units:171},
+  {id:2390664,prod:157.0,util:79.88,units:685},
+  {id:2391616,prod:156.0,util:91.79,units:1087},
+  {id:2109430,prod:155.0,util:89.38,units:1092},
   {id:2439625,prod:154.0,util:91.78,units:168},
-  {id:2461264,prod:153.0,util:88.74,units:168},
-  {id:2391518,prod:150.0,util:78.83,units:82},
   {id:2452967,prod:150.0,util:94.85,units:162},
-  {id:2461182,prod:147.0,util:90.03,units:472},
   {id:2428354,prod:143.0,util:89.93,units:110},
-  {id:2132392,prod:133.0,util:89.37,units:429},
-  {id:2391610,prod:130.0,util:75.33,units:124},
+  {id:2461264,prod:139.0,util:93.08,units:268},
+  {id:2461194,prod:134.0,util:82.34,units:819},
+  {id:2428375,prod:131.0,util:90.71,units:895},
   {id:2178629,prod:129.0,util:70.95,units:94},
+  {id:2132392,prod:124.0,util:83.97,units:540},
   {id:2428388,prod:124.0,util:80.88,units:108},
-  {id:2461194,prod:122.0,util:67.26,units:263},
-  {id:2233960,prod:121.0,util:88.65,units:390},
-  {id:2428375,prod:119.0,util:87.13,units:365},
+  {id:2461182,prod:124.0,util:87.23,units:884},
+  {id:2391610,prod:122.0,util:75.66,units:142},
+  {id:1921690,prod:119.0,util:74.74,units:339},
   {id:2370120,prod:117.0,util:75.9,units:222},
   {id:2391186,prod:117.0,util:73.3,units:95},
-  {id:2391171,prod:116.0,util:80.87,units:355},
-  {id:2390951,prod:115.0,util:82.49,units:354},
-  {id:2194273,prod:111.0,util:75.89,units:330},
-  {id:2461216,prod:111.0,util:84.48,units:351},
+  {id:2390951,prod:113.0,util:83.64,units:805},
+  {id:2428370,prod:111.0,util:84.01,units:189},
   {id:2391136,prod:110.0,util:78.95,units:82},
-  {id:1921712,prod:109.0,util:52.28,units:84},
-  {id:2027342,prod:108.0,util:69.16,units:306},
-  {id:2209682,prod:103.0,util:86.52,units:293},
-  {id:2241968,prod:103.0,util:68.36,units:334},
+  {id:2194257,prod:109.0,util:79.98,units:186},
+  {id:2233960,prod:109.0,util:81.33,units:773},
+  {id:2391518,prod:109.0,util:71.3,units:374},
+  {id:2391171,prod:108.0,util:82.96,units:770},
+  {id:2194273,prod:105.0,util:72.02,units:330},
+  {id:2391422,prod:105.0,util:64.54,units:308},
+  {id:2461216,prod:105.0,util:80.79,units:618},
+  {id:2209682,prod:104.0,util:84.02,units:401},
   {id:2391329,prod:103.0,util:73.77,units:97},
-  {id:2433760,prod:103.0,util:91.32,units:333},
   {id:2428362,prod:99.0,util:63.56,units:74},
-  {id:2461250,prod:99.0,util:83.01,units:298},
+  {id:2148530,prod:97.0,util:68.45,units:285},
+  {id:2461250,prod:92.0,util:81.89,units:658},
+  {id:2027342,prod:91.0,util:58.59,units:307},
   {id:2125442,prod:89.0,util:52.48,units:65},
-  {id:1805739,prod:85.0,util:58.75,units:274},
-  {id:2242089,prod:84.0,util:70.97,units:272},
-  {id:2139922,prod:81.0,util:70.15,units:247},
-  {id:548992,prod:78.0,util:57.84,units:217},
-  {id:2126576,prod:77.0,util:62.31,units:219},
-  {id:2126588,prod:75.0,util:67.79,units:242},
-  {id:2148524,prod:72.0,util:62.78,units:223},
-  {id:2027315,prod:70.0,util:55.51,units:53},
-  {id:1921713,prod:67.0,util:61.84,units:216},
-  {id:2027474,prod:64.0,util:62.11,units:208},
+  {id:2433760,prod:88.0,util:84.9,units:639},
+  {id:2126589,prod:80.0,util:44.18,units:87},
   {id:2027509,prod:0.0,util:0.0,units:0},
   {id:2126581,prod:0.0,util:0.0,units:0},
-  {id:2126589,prod:0.0,util:0.0,units:0},
   {id:2132402,prod:0.0,util:0.0,units:0},
   {id:2210941,prod:0.0,util:0.0,units:0},
   {id:2210942,prod:0.0,util:0.0,units:0},
   {id:2390750,prod:0.0,util:0.0,units:0},
   {id:2391097,prod:0.0,util:0.0,units:0},
-  {id:2391422,prod:0.0,util:0.0,units:0},
   {id:2391513,prod:0.0,util:0.0,units:0},
   {id:2461188,prod:0.0,util:0.0,units:0},
   {id:2461324,prod:0.0,util:0.0,units:0},
@@ -1133,6 +1184,70 @@ const escalaDados = [
   {id:2391616,escala:'B',tl:'GABRIEL TESKE'},
 ];
 
+
+const ocioData = [
+  {id:2132402,ocio:100.0,min:1.8,util:0.0,unid:0},
+  {id:2125442,ocio:47.5,min:20.8,util:52.0,unid:65},
+  {id:2126589,ocio:44.5,min:22.9,util:56.0,unid:87},
+  {id:2027342,ocio:39.6,min:83.7,util:59.0,unid:307},
+  {id:2210941,ocio:37.0,min:54.6,util:63.0,unid:73},
+  {id:2428362,ocio:36.4,min:16.2,util:64.0,unid:74},
+  {id:2391422,ocio:30.3,min:37.8,util:70.0,unid:250},
+  {id:2148530,ocio:29.0,min:59.2,util:71.0,unid:266},
+  {id:2178629,ocio:29.0,min:12.7,util:71.0,unid:94},
+  {id:2391518,ocio:28.3,min:45.0,util:72.0,unid:308},
+  {id:2391186,ocio:26.7,min:12.9,util:73.0,unid:95},
+  {id:2391329,ocio:26.2,min:14.8,util:74.0,unid:97},
+  {id:2391610,ocio:24.7,min:14.1,util:75.0,unid:124},
+  {id:2370120,ocio:24.1,min:27.2,util:76.0,unid:222},
+  {id:2391025,ocio:23.7,min:11.3,util:76.0,unid:131},
+  {id:2391514,ocio:22.8,min:9.9,util:77.0,unid:135},
+  {id:1762361,ocio:22.6,min:14.6,util:77.0,unid:171},
+  {id:2391136,ocio:21.1,min:9.3,util:79.0,unid:82},
+  {id:2390664,ocio:20.1,min:52.5,util:80.0,unid:685},
+  {id:2194257,ocio:20.0,min:20.5,util:80.0,unid:186},
+  {id:2461250,ocio:19.7,min:74.3,util:80.0,unid:572},
+  {id:2428388,ocio:19.1,min:9.9,util:81.0,unid:108},
+  {id:1921690,ocio:18.9,min:22.7,util:81.0,unid:286},
+  {id:2461194,ocio:18.6,min:58.4,util:81.0,unid:723},
+  {id:2390951,ocio:17.1,min:64.5,util:83.0,unid:699},
+  {id:2233960,ocio:17.1,min:64.0,util:83.0,unid:697},
+  {id:2391171,ocio:16.6,min:62.4,util:83.0,unid:698},
+  {id:2132392,ocio:16.0,min:41.7,util:84.0,unid:540},
+  {id:2428370,ocio:16.0,min:16.2,util:84.0,unid:189},
+  {id:2391407,ocio:15.8,min:7.0,util:84.0,unid:130},
+  {id:2461216,ocio:15.3,min:59.4,util:80.0,unid:523},
+  {id:2209682,ocio:15.1,min:36.7,util:84.0,unid:401},
+  {id:2194273,ocio:14.7,min:52.3,util:72.0,unid:330},
+  {id:2433760,ocio:13.9,min:53.0,util:86.0,unid:602},
+  {id:2461182,ocio:12.8,min:48.6,util:87.0,unid:807},
+  {id:2217898,ocio:11.7,min:5.3,util:88.0,unid:157},
+  {id:2461264,ocio:11.3,min:7.4,util:89.0,unid:168},
+  {id:2461288,ocio:10.3,min:4.8,util:90.0,unid:134},
+  {id:2428354,ocio:10.1,min:4.6,util:90.0,unid:110},
+  {id:2428375,ocio:8.9,min:33.9,util:91.0,unid:857},
+  {id:2391079,ocio:8.8,min:5.7,util:91.0,unid:183},
+  {id:2439625,ocio:8.2,min:5.3,util:92.0,unid:168},
+  {id:2428349,ocio:8.1,min:4.8,util:92.0,unid:169},
+  {id:2391616,ocio:6.2,min:23.0,util:94.0,unid:1},
+  {id:2427052,ocio:5.7,min:21.2,util:94.0,unid:1},
+  {id:2452967,ocio:5.2,min:3.3,util:95.0,unid:162},
+  {id:2461188,ocio:3.4,min:11.5,util:0.0,unid:0},
+  {id:2461324,ocio:3.2,min:12.1,util:0.0,unid:0},
+  {id:2210942,ocio:2.9,min:6.5,util:0.0,unid:0},
+  {id:436179,ocio:2.6,min:9.6,util:0.0,unid:0},
+  {id:2126581,ocio:2.0,min:6.4,util:0.0,unid:0},
+  {id:2027509,ocio:1.7,min:6.1,util:0.0,unid:0},
+  {id:2391513,ocio:0.7,min:2.3,util:0.0,unid:0},
+  {id:2390750,ocio:0.5,min:1.8,util:0.0,unid:0},
+  {id:2391097,ocio:0.5,min:1.8,util:0.0,unid:0},
+  {id:2060448,ocio:0.0,min:0.0,util:0.0,unid:0},
+  {id:2170105,ocio:0.0,min:0.0,util:0.0,unid:0},
+  {id:2461213,ocio:0.0,min:0.0,util:0.0,unid:0},
+  {id:2027470,ocio:0.0,min:0.0,util:0.0,unid:0},
+  {id:2391156,ocio:0.0,min:0.0,util:0.0,unid:0},
+];
+
 const CONFIG = {
   RS:{ meta:107, orange_min:85, rep_esp:2461246, meta_esp:74.9 },
 };
@@ -1172,14 +1287,16 @@ function render(){
   document.getElementById('s-acima-sub').textContent=`prod ≥ ${cfg.meta}`;
   document.getElementById('s-atencao-sub').textContent=`prod ${cfg.orange_min}–${cfg.meta-1}`;
   document.getElementById('s-abaixo-sub').textContent=`prod < ${cfg.orange_min}`;
-  let total=reps.length,comProd=0,acima=0,atencao=0,abaixo=0,semProd=0,totalUnits=0,utilBaixo=0;
+  let total=reps.length,comProd=0,acima=0,atencao=0,abaixo=0,semProd=0,totalUnits=0,utilBaixo=0,utilSoma=0;
   reps.forEach(r=>{
     const st=getStatus(r.prod,r.id);
     totalUnits+=r.units;
     if(r.prod===0) semProd++;
     else{ comProd++; if(st==='green') acima++; else if(st==='orange') atencao++; else abaixo++; }
     if(r.prod>0 && r.util<85) utilBaixo++;
+    if(r.prod>0) utilSoma+=r.util;
   });
+  const utilMedia = comProd>0 ? (utilSoma/comProd).toFixed(1)+'%' : '—';
   document.getElementById('s-total').textContent=total;
   document.getElementById('s-ativo').textContent=comProd;
   document.getElementById('s-acima').textContent=acima;
@@ -1188,7 +1305,7 @@ function render(){
   document.getElementById('s-sem').textContent=semProd;
   document.getElementById('s-units').textContent=totalUnits.toLocaleString('pt-BR');
   document.getElementById('s-util-baixo').textContent=utilBaixo;
-  document.getElementById('s-util-total').textContent=comProd;
+  document.getElementById('s-util-media').textContent=utilMedia;
   document.getElementById('f-all').textContent=total;
   document.getElementById('f-green').textContent=acima;
   document.getElementById('f-orange').textContent=atencao;
@@ -1540,6 +1657,7 @@ function switchTab(id,btn){
   if(id==='escala') renderEscala();
   if(id==='info') renderInfoPage();
   if(id==='meal') renderMeal();
+  if(id==='ocio') renderOcio();
 }
 
 // ═══════════════════════════════════
@@ -1586,6 +1704,74 @@ function closeCalModal(){
   document.getElementById('cal-modal').style.display='none';
   document.body.style.overflow='';
 }
+// ═══════════════════════════════════
+//  OCIOSIDADE
+// ═══════════════════════════════════
+let ocioFiltro = 'all';
+
+function ocioCls(v){
+  if(v >= 30) return 'pill-r';
+  if(v >= 15) return 'pill-o';
+  if(v > 0)   return 'pill-g';
+  return 'pill-gray';
+}
+
+function setOcioFilter(f, btn){
+  ocioFiltro = f;
+  btn.closest('.filter-bar').querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderOcio();
+}
+
+function renderOcio(){
+  document.getElementById('ocio-date').textContent = today;
+  const q = (document.getElementById('ocio-search').value||'').trim();
+
+  const total = ocioData.length;
+  const alto  = ocioData.filter(r=>r.ocio>=30).length;
+  const med   = ocioData.filter(r=>r.ocio>=15&&r.ocio<30).length;
+  const ok    = ocioData.filter(r=>r.ocio<15).length;
+  const totalUnid = ocioData.reduce((a,r)=>a+(r.unid||0),0);
+
+  document.getElementById('oc-total').textContent = total;
+  document.getElementById('oc-alto').textContent  = alto;
+  document.getElementById('oc-med').textContent   = med;
+  document.getElementById('oc-ok').textContent    = ok;
+  document.getElementById('oc-units').textContent = totalUnid.toLocaleString('pt-BR');
+  document.getElementById('of-all').textContent   = total;
+  document.getElementById('of-alto').textContent  = alto;
+  document.getElementById('of-med').textContent   = med;
+  document.getElementById('of-ok').textContent    = ok;
+
+  let lista = ocioData.filter(r=>{
+    const fOk = ocioFiltro==='all'
+      || (ocioFiltro==='alto' && r.ocio>=30)
+      || (ocioFiltro==='med'  && r.ocio>=15 && r.ocio<30)
+      || (ocioFiltro==='ok'   && r.ocio<15);
+    const sOk = !q || String(r.id).includes(q);
+    return fOk && sOk;
+  });
+
+  const tbody  = document.getElementById('tbody-ocio');
+  const noRows = document.getElementById('no-rows-ocio');
+
+  if(!lista.length){ tbody.innerHTML=''; noRows.style.display='block'; return; }
+  noRows.style.display='none';
+
+  tbody.innerHTML = lista.map((r,i)=>{
+    const rank = i<3 ? `<span class="medal">${['🥇','🥈','🥉'][i]}</span>` : `<span class="rank-num">${i+1}</span>`;
+    const rowBg = r.ocio>=30 ? 'background:#fff1f2' : r.ocio>=15 ? 'background:#fff7ed' : '';
+    return `<tr style="${rowBg}">
+      <td>${rank}</td>
+      <td><strong style="font-size:14px;color:var(--navy)">${r.id}</strong></td>
+      <td><span class="pill ${ocioCls(r.ocio)}">${r.ocio}%</span></td>
+      <td><span style="font-size:13px;font-weight:600;color:var(--text)">${(function(){const h=Math.floor(r.min/60),m=Math.round(r.min%60);return h>0?h+'h'+String(m).padStart(2,'0')+'m':m+'min';})()}</span></td>
+      <td><span class="pill ${utilCls(r.util)}">${r.util===0?'—':r.util+'%'}</span></td>
+      <td class="units-val">${(r.unid||0).toLocaleString('pt-BR')}</td>
+    </tr>`;
+  }).join('');
+}
+
 // INIT
 render();
 renderEscala();
