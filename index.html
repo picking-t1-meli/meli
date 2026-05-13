@@ -578,6 +578,7 @@ tbody tr{animation:fadeIn .2s ease both;}
     <div class="sum-card c-red"><div class="sum-label">Abaixo</div><div class="sum-val v-red" id="s-abaixo">—</div><div class="sum-sub" id="s-abaixo-sub">prod &lt; 85</div></div>
     <div class="sum-card c-gray"><div class="sum-label">Sem Produção</div><div class="sum-val v-gray" id="s-sem">—</div><div class="sum-sub">não registrado</div></div>
     <div class="sum-card c-purple"><div class="sum-label">Total Unidades</div><div class="sum-val v-purple" id="s-units">—</div><div class="sum-sub">no turno</div></div>
+    <div class="sum-card" style="border-bottom:3px solid #f59e0b;"><div class="sum-label" style="color:#b45309;">⚠️ Util. &lt; 85%</div><div class="sum-val" id="s-util-baixo" style="color:#b45309;">—</div><div class="sum-sub" id="s-util-pct">de <span id="s-util-total">—</span> ativos</div></div>
   </div>
 
   <div class="filter-bar">
@@ -586,6 +587,7 @@ tbody tr{animation:fadeIn .2s ease both;}
     <button class="filter-tab ft-orange" onclick="setFilter('orange',this)">Atenção <span class="f-badge fb-orange" id="f-orange">—</span></button>
     <button class="filter-tab ft-red" onclick="setFilter('red',this)">Abaixo <span class="f-badge fb-red" id="f-red">—</span></button>
     <button class="filter-tab ft-gray" onclick="setFilter('gray',this)">Sem Produção <span class="f-badge fb-gray" id="f-gray">—</span></button>
+    <button class="filter-tab" onclick="setFilter('util',this)" style="color:#b45309;border-bottom-color:#f59e0b">⚠️ Util. &lt;85% <span class="f-badge" id="f-util" style="background:#fef3c7;color:#b45309">—</span></button>
   </div>
 
   <div class="search-bar">
@@ -938,57 +940,70 @@ tbody tr{animation:fadeIn .2s ease both;}
 //  DADOS RS
 // ═══════════════════════════════════
 const repsRS = [
-  {id:2125442,prod:209.0,util:94.89,units:203},
-  {id:2391079,prod:209.0,util:85.34,units:178},
-  {id:2427052,prod:209.0,util:95.88,units:1469},
-  {id:2132392,prod:199.0,util:92.37,units:318},
-  {id:2461264,prod:197.0,util:95.84,units:199},
-  {id:2461194,prod:179.0,util:95.42,units:196},
-  {id:2391616,prod:175.0,util:89.06,units:1196},
-  {id:2461188,prod:167.0,util:90.57,units:172},
-  {id:2428353,prod:159.0,util:92.63,units:180},
-  {id:2391186,prod:152.0,util:91.48,units:177},
-  {id:2428375,prod:152.0,util:93.88,units:985},
-  {id:2391025,prod:150.0,util:73.87,units:332},
-  {id:2428414,prod:150.0,util:91.06,units:409},
-  {id:2391407,prod:148.0,util:84.38,units:124},
-  {id:2194273,prod:146.0,util:85.42,units:894},
-  {id:1762361,prod:145.0,util:78.12,units:1029},
-  {id:2178629,prod:145.0,util:77.39,units:782},
-  {id:2461324,prod:144.0,util:96.18,units:870},
-  {id:2109430,prod:143.0,util:87.58,units:799},
-  {id:2428362,prod:142.0,util:91.68,units:159},
-  {id:2390664,prod:139.0,util:95.07,units:149},
-  {id:2461213,prod:138.0,util:81.76,units:468},
-  {id:2461288,prod:137.0,util:90.38,units:973},
-  {id:2370120,prod:136.0,util:74.27,units:425},
-  {id:2391514,prod:133.0,util:85.28,units:935},
-  {id:2391171,prod:128.0,util:88.2,units:903},
-  {id:2194257,prod:127.0,util:80.21,units:301},
-  {id:2391329,prod:126.0,util:80.79,units:885},
-  {id:2439625,prod:124.0,util:89.03,units:877},
-  {id:2391610,prod:122.0,util:77.98,units:868},
-  {id:2428370,prod:122.0,util:82.71,units:188},
-  {id:2461250,prod:122.0,util:84.55,units:476},
-  {id:2428349,prod:119.0,util:82.54,units:843},
-  {id:2452967,prod:119.0,util:89.32,units:847},
-  {id:2428354,prod:114.0,util:79.2,units:808},
-  {id:2217898,prod:112.0,util:77.93,units:190},
-  {id:2209682,prod:111.0,util:77.95,units:366},
-  {id:2390951,prod:111.0,util:80.55,units:789},
-  {id:2428388,prod:111.0,util:75.37,units:817},
-  {id:2433760,prod:110.0,util:81.84,units:814},
-  {id:2027342,prod:107.0,util:65.91,units:119},
-  {id:2461216,prod:107.0,util:96.74,units:224},
-  {id:2233960,prod:106.0,util:82.39,units:644},
-  {id:2391422,prod:86.0,util:52.13,units:243},
-  {id:2391518,prod:79.0,util:54.58,units:59},
-  {id:2027470,prod:0.0,util:0.0,units:0},
-  {id:2060448,prod:0.0,util:0.0,units:0},
+  {id:2217898,prod:208.0,util:88.26,units:157},
+  {id:2391514,prod:186.0,util:77.16,units:135},
+  {id:2390664,prod:181.0,util:86.78,units:585},
+  {id:2109430,prod:177.0,util:90.06,units:570},
+  {id:2427052,prod:177.0,util:95.86,units:572},
+  {id:2391616,prod:176.0,util:96.19,units:567},
+  {id:2391407,prod:175.0,util:84.2,units:130},
+  {id:2461288,prod:174.0,util:89.66,units:134},
+  {id:2391079,prod:169.0,util:91.19,units:183},
+  {id:2428349,prod:169.0,util:91.89,units:169},
+  {id:2391025,prod:164.0,util:76.28,units:131},
+  {id:1762361,prod:158.0,util:77.43,units:171},
+  {id:2439625,prod:154.0,util:91.78,units:168},
+  {id:2461264,prod:153.0,util:88.74,units:168},
+  {id:2391518,prod:150.0,util:78.83,units:82},
+  {id:2452967,prod:150.0,util:94.85,units:162},
+  {id:2461182,prod:147.0,util:90.03,units:472},
+  {id:2428354,prod:143.0,util:89.93,units:110},
+  {id:2132392,prod:133.0,util:89.37,units:429},
+  {id:2391610,prod:130.0,util:75.33,units:124},
+  {id:2178629,prod:129.0,util:70.95,units:94},
+  {id:2428388,prod:124.0,util:80.88,units:108},
+  {id:2461194,prod:122.0,util:67.26,units:263},
+  {id:2233960,prod:121.0,util:88.65,units:390},
+  {id:2428375,prod:119.0,util:87.13,units:365},
+  {id:2370120,prod:117.0,util:75.9,units:222},
+  {id:2391186,prod:117.0,util:73.3,units:95},
+  {id:2391171,prod:116.0,util:80.87,units:355},
+  {id:2390951,prod:115.0,util:82.49,units:354},
+  {id:2194273,prod:111.0,util:75.89,units:330},
+  {id:2461216,prod:111.0,util:84.48,units:351},
+  {id:2391136,prod:110.0,util:78.95,units:82},
+  {id:1921712,prod:109.0,util:52.28,units:84},
+  {id:2027342,prod:108.0,util:69.16,units:306},
+  {id:2209682,prod:103.0,util:86.52,units:293},
+  {id:2241968,prod:103.0,util:68.36,units:334},
+  {id:2391329,prod:103.0,util:73.77,units:97},
+  {id:2433760,prod:103.0,util:91.32,units:333},
+  {id:2428362,prod:99.0,util:63.56,units:74},
+  {id:2461250,prod:99.0,util:83.01,units:298},
+  {id:2125442,prod:89.0,util:52.48,units:65},
+  {id:1805739,prod:85.0,util:58.75,units:274},
+  {id:2242089,prod:84.0,util:70.97,units:272},
+  {id:2139922,prod:81.0,util:70.15,units:247},
+  {id:548992,prod:78.0,util:57.84,units:217},
+  {id:2126576,prod:77.0,util:62.31,units:219},
+  {id:2126588,prod:75.0,util:67.79,units:242},
+  {id:2148524,prod:72.0,util:62.78,units:223},
+  {id:2027315,prod:70.0,util:55.51,units:53},
+  {id:1921713,prod:67.0,util:61.84,units:216},
+  {id:2027474,prod:64.0,util:62.11,units:208},
+  {id:2027509,prod:0.0,util:0.0,units:0},
+  {id:2126581,prod:0.0,util:0.0,units:0},
   {id:2126589,prod:0.0,util:0.0,units:0},
   {id:2132402,prod:0.0,util:0.0,units:0},
-  {id:2170105,prod:0.0,util:0.0,units:0},
+  {id:2210941,prod:0.0,util:0.0,units:0},
   {id:2210942,prod:0.0,util:0.0,units:0},
+  {id:2390750,prod:0.0,util:0.0,units:0},
+  {id:2391097,prod:0.0,util:0.0,units:0},
+  {id:2391422,prod:0.0,util:0.0,units:0},
+  {id:2391513,prod:0.0,util:0.0,units:0},
+  {id:2461188,prod:0.0,util:0.0,units:0},
+  {id:2461324,prod:0.0,util:0.0,units:0},
+  {id:436179,prod:0.0,util:0.0,units:0},
 ];
 const escalaDados = [
   {id:2132392,escala:'D',tl:'GABRIEL TESKE'},
@@ -1157,12 +1172,13 @@ function render(){
   document.getElementById('s-acima-sub').textContent=`prod ≥ ${cfg.meta}`;
   document.getElementById('s-atencao-sub').textContent=`prod ${cfg.orange_min}–${cfg.meta-1}`;
   document.getElementById('s-abaixo-sub').textContent=`prod < ${cfg.orange_min}`;
-  let total=reps.length,comProd=0,acima=0,atencao=0,abaixo=0,semProd=0,totalUnits=0;
+  let total=reps.length,comProd=0,acima=0,atencao=0,abaixo=0,semProd=0,totalUnits=0,utilBaixo=0;
   reps.forEach(r=>{
     const st=getStatus(r.prod,r.id);
     totalUnits+=r.units;
     if(r.prod===0) semProd++;
     else{ comProd++; if(st==='green') acima++; else if(st==='orange') atencao++; else abaixo++; }
+    if(r.prod>0 && r.util<85) utilBaixo++;
   });
   document.getElementById('s-total').textContent=total;
   document.getElementById('s-ativo').textContent=comProd;
@@ -1171,11 +1187,14 @@ function render(){
   document.getElementById('s-abaixo').textContent=abaixo;
   document.getElementById('s-sem').textContent=semProd;
   document.getElementById('s-units').textContent=totalUnits.toLocaleString('pt-BR');
+  document.getElementById('s-util-baixo').textContent=utilBaixo;
+  document.getElementById('s-util-total').textContent=comProd;
   document.getElementById('f-all').textContent=total;
   document.getElementById('f-green').textContent=acima;
   document.getElementById('f-orange').textContent=atencao;
   document.getElementById('f-red').textContent=abaixo;
   document.getElementById('f-gray').textContent=semProd;
+  document.getElementById('f-util').textContent=utilBaixo;
   document.getElementById('footer-prod').textContent=`Gerado em ${today} · BRRJ02 | Outbound Picking T1 · Setor RS`;
   renderTable();
 }
@@ -1188,7 +1207,12 @@ function renderTable(){
   reps.filter(r=>r.prod>0).forEach((r,i)=>{ rankMap[r.id]=i+1; });
   let lista=reps.filter(r=>{
     const st=getStatus(r.prod,r.id);
-    const mf=filtro==='all'||(filtro==='green'&&st==='green')||(filtro==='orange'&&st==='orange')||(filtro==='red'&&st==='red')||(filtro==='gray'&&st==='gray');
+    const mf=filtro==='all'
+      ||(filtro==='green'&&st==='green')
+      ||(filtro==='orange'&&st==='orange')
+      ||(filtro==='red'&&st==='red')
+      ||(filtro==='gray'&&st==='gray')
+      ||(filtro==='util'&&r.prod>0&&r.util<85);
     const ms=searchVal===''||String(r.id).includes(searchVal);
     return mf&&ms;
   });
@@ -1201,6 +1225,7 @@ function renderTable(){
     const sp=(r.id===cfg.rep_esp&&cfg.meta_esp)?`<span class="special-tag">meta 70% = ${cfg.meta_esp}</span>`:'';
     const tr=document.createElement('tr');
     if(rg&&rg<=3) tr.className='top3-row';
+    if(r.prod>0&&r.util<85) tr.style.background='#fffbeb';
     tr.style.animationDelay=`${i*.02}s`;
     tr.innerHTML=`
       <td>${rank}</td>
